@@ -1,0 +1,236 @@
+
+                                        LTE Data Driver
+                                 Multiple Network Interface
+                                          Ver 1.06
+                                         05/27/2011
+
+
+   The data driver now supports multiple net interfaces via the /proc/lte_dd command interface. The following
+commands and their arguments are supported:
+
+    net_new:ifname:epsid:priority
+    net_delete:ifname
+    net_eps:ifname:epsid
+    net_eps_mac_map_add:epsid:mac_addr
+    net_eps_mac_map_rm:epsid
+    net_priority:ifname:priority
+    net_log:level
+    dd_log:level
+    dd_ul_packet_profile:enable:reset
+    dd_dl_packet_profile:enable:reset
+    dd_multipacket:enable
+    dd_lpbp_mode:enable
+    dd_disable_ul:enable
+    qos_log:level
+    qos_mode:mode
+    hif_cmd:cmd
+    
+    
+    Command: net_new
+    Description: The net_new command is used to create a net interface
+        Arg:ifname - The name of the interface
+        Arg:epsid - The eps id assigned to this interface
+        Arg:priority - The FIFO priority queue.
+    
+    Command: net_delete
+    Description: The net_delete command is used to delete a net interface
+        Arg:ifname - The name of the interface
+        
+    Command: net_eps
+    Description: The net_eps command is used to set the eps id on a net interface
+        Arg:ifname - The name of the interface.
+        Arg:epsid - The eps id to be assigned to the interface. Range 5 - 15
+
+    Command: net_bridge_mode_ul
+    Description: The net_bridge_mode_ul command is used to enable the eps id
+     to MAC address mapping for UL packets. If this command is enabled, the source 
+     MAC address given in this command will be used to match UL packets
+     against the default bearer id associated with the PDN to identify the PDN.
+     If 'disabled' then PDN will be identified based on source IPv4
+     address/ network provided IPv6 interface identifier.
+        Arg:enable - Enable or disable UL bridge mode. Range 0 - 1, default is
+          0 (disabled).
+
+    Command: net_bridge_mode_dl
+    Description: The net_bridge_mode command is used to enable the eps id to
+           MAC address mapping for DL packets. This command will also display the
+           EPS ID to MAC table in syslog. If 'disabled' a default MAC address will be
+           associated with lte0 (routed solution) and assigned to DL packets.
+        Arg:enable - Enable or disable DL bridge mode. Range 0 - 1, default is
+            0 (disabled).
+
+    Command: net_eps_mac_map_add_dl
+    Description: The net_eps_mac_map_add_dl command is used to add an eps id to
+        MAC address mapping for DL packets
+        Arg:epsid - The eps id obtained from LTE stack as part of DL data.  Range 5 - 15
+        Arg:mac_addr - The MAC address to use for the specified eps id, value in HEX with no 0x prefix nor ":" delimiters
+
+    Command: net_eps_mac_map_rm_dl
+    Description: The net_eps_mac_map_rm_dl command is used to remove an eps id to
+        MAC address mapping for DL packets
+        Arg:epsid - The eps id obtained from LTE stack as part of DL data.  Range 5 - 15
+
+    Command: net_eps_mac_map_add_ul
+    Description: The net_eps_mac_map_add_ul command is used to add an eps id to
+       MAC address mapping for determining the PDN associated with UL packets.
+        Arg:epsid - The eps id of the default bearer associated with the MAC address of the interface of that PDN on the host AP.
+                Range 5 - 15
+        Arg:mac_addr - The MAC address to use for the specified eps id, value in HEX with no 0x prefix nor ":" delimiters
+
+    Command: net_eps_mac_map_rm_ul
+    Description: The net_eps_mac_map_rm command is used to remove an eps id to MAC
+      address mapping for UL packets
+        Arg:epsid - The eps id. Range 5 - 15
+
+    Command: net_priority
+    Description: The net_priority command is used to set the FIFO priority on a net interface
+        Arg:ifname - The name of the interface.
+        Arg:priority - The FIFO priority to be assigned to the interface. Range 0 - 127
+        
+    Command: net_log
+    Description: The net_log command is used to set the log level of the network driver.
+        Arg:level - The log level. Range 2 - 6, default is 2.
+    
+    Command: dd_log
+    Description: The dd_log command is used to set the log level of the data driver.
+        Arg:level - The log level. Range 2 - 6, default is 2.
+    
+    Command: dd_ul_packet_profile
+    Description: The dd_ul_packet_profile command is used to enable data packet profiling for all UL packets. To
+        access the profile data, do "cat /proc/lte_dd_ul_profile"
+        Arg:enable - Enable or disable profiling. Range 0 - 1, default is 0.
+        Arg:reset - Reset the current log to zero elements
+    
+    Command: dd_dl_packet_profile
+    Description: The dd_dl_packet_profile command is used to enable data packet profiling for all DL packets. To
+        access the profile data, do "cat /proc/lte_dd_dl_profile"
+        Arg:enable - Enable or disable profiling. Range 0 - 1, default is 0.
+        Arg:reset - Reset the current log to zero elements
+
+    Command: dd_multipacket
+    Description: The dd_multipacket command is used to enable or disable the multi packet mode in the data driver.
+        If enabled, multiple packets are submitted or received from the 4GHIF SDMA, otherwise single packet at a time
+        Arg:enable - Enable or disable multi packet mode. Range 0 - 1, default is 1.
+        
+    Command: dd_lpbp_mode
+    Description: The dd_lpbp_mode command is used to enable or disable ping request conversion when using the special loop-back BP.
+        If enabled, all ping requests are converted to replies so that pings initiated from the host will succeed.
+        Arg:enable - Enable or disable loop-back BP mode. Range 0 - 1, default is 0.
+
+    Command: dd_disable_ul
+    Description: The dd_disable_ul command is used to enable or disable all UL
+traffic to the  BP.
+        If enabled, all UL traffic is simply dropped.
+        Arg:enable - Enable or disable disabling UL traffic to BP. Range 0 - 1, default is 0.
+
+    Command: qos_log
+    Description: The qos_log command is used to set the log level of the legacy QOS module.
+        Arg:level - The log level. Range 2 - 6, default is 2.
+    
+    Command: qos_mode
+    Description: The qos_mode command is used to switch between the legacy QOS module and IP Table EPS tagging.
+        Arg:mode - The QOS mode. 0 = Legacy QOS Module; 1 = IP Tables (Uses the eps id configured for the net interface)
+        WARNING:  All interfaces must be DOWN prior to switching modes so that there is no data traffic
+
+    Command: hif_cmd
+    Description: The hif_cmd command is used to issue a command to the 4GHIF component.
+        Arg:cmd - The 4GHIF command to issue. No range check on value, value is scanned as integer
+        
+
+Rules/Notes:
+
+    1. All interfaces must be configured "down" via ifconfig prior to switching the QOS mode.
+    2. Interface "lte0" is persistent and cannot be deleted.
+    3. The : character is used as the delimiter between commands and arguments.
+    4. The space character is used as delimiter between commands.
+    5. The interface priority is not currently implemented.  The dequeue is currently round-robin between the interfaces.
+    6. After interface creation, interfaces must then be configured via ifconfig.
+    7. To delete an interface, it must be configured "down" via ifconfig so that there is no traffic on the interface.
+    8. Multiple commands can be specified in the command string.
+    9. The /proc/lte_dd command interface is not reentrant.
+    10. All command processing results are listed via dmesg.
+    11. Data driver log level 4 will display for each UL packet the interface name and eps id.
+    12. The log levels are defined as follows:
+    
+        #define AMP_LOG_LEVEL_ERROR     2
+        #define AMP_LOG_LEVEL_WARNING   3
+        #define AMP_LOG_LEVEL_DEBUG1    4
+        #define AMP_LOG_LEVEL_DEBUG2    5
+        #define AMP_LOG_LEVEL_DEBUG3    6
+
+
+Examples:
+
+    To create a new interface named "lte7", eps id 11, priority 1, do:
+    
+        echo net_new:lte7:11:1 > /proc/lte_dd
+    
+    
+    To set the log level of the data driver to 4, do:
+    
+        echo dd_log:4 > /proc/lte_dd
+    
+    
+    To delete an interface named "lte4", do:
+    
+        echo net_delete:lte4 > /proc/lte_dd
+        
+        
+    To create three new interfaces on one command line, do:
+    
+        echo net_new:lte1:6:1 net_new:lte2:7:1 net_new:lte3:8:1 > /proc/lte_dd
+    
+    
+    To get the status of the data driver, do:
+    
+        cat /proc/lte_dd
+
+        
+    To set the QOS mode of the network driver to IP Tables (Uses the eps id configured for the net interface) 
+
+        echo qos_mode:1 > /proc/lte_dd
+    
+        
+    To enable UL profiling but don't reset the UL list 
+
+        echo dd_ul_packet_profile:1:0 > /proc/lte_dd
+        
+    
+    To disable DL profiling and reset the DL list 
+
+        echo dd_dl_packet_profile:0:1 > /proc/lte_dd
+   
+   
+    To enable special loop-back BP mode so pings from host work 
+
+        echo dd_lpbp_mode:1 > /proc/lte_dd
+
+
+    To map DL packets tagged with eps id 11 to use MAC address 00:1f:29:a1:7e:d6, do:
+   
+        echo net_eps_mac_map_add_dl:11:001F29A17ED6 > /proc/lte_dd
+
+
+    To remove the eps id 11 to MAC mapping (uses default), do:
+   
+        echo net_eps_mac_map_rm_dl:11 > /proc/lte_dd
+
+
+    To enable the DL network driver bridge mode and display the current EPS ID to MAC table, do:
+    
+        echo net_bridge_mode_dl:1 > /proc/lte_dd
+        
+
+    To enable the network driver UL bridge mode and display the current EPS ID to MAC table, do:
+
+	echo net_bridge_mode_ul:1 > /proc/lte_dd
+
+    To map UL packets for PDN with default bearer eps id 5 to use MAC address 00:1f:29:a1:7e:d6, do:
+   
+        echo net_eps_mac_map_add_ul:5:001F29A17ED6 > /proc/lte_dd
+
+
+    To remove the UL eps id 5 to MAC mapping, do:
+   
+        echo net_eps_mac_map_rm_ul:5 > /proc/lte_dd
+

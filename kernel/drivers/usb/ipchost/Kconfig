@@ -1,0 +1,41 @@
+#
+# MAILBOX IPC driver configuration
+#
+
+comment "NOTE: MAILBOX IPC enables AP-BP data transfer"
+
+config MAILBOX_IPC
+	tristate "MAILBOX IPC support"
+	---help---
+	  Say Y here if you want to enable AP-BP data transfer.
+
+config MAILBOX_IPC_TEST
+        tristate "MAILBOX IPC TEST support"
+        depends on MAILBOX_IPC
+        ---help---
+          Say Y here if you want to build IPC test module.
+
+          To compile this driver as a module, choose M here: the
+          module will be called usb-ipc-test.
+
+config IPC_4GHIF_TEST
+        tristate "4G HIF IPC TEST support"
+        depends on MAILBOX_IPC
+        ---help---
+          Say Y here if you want to build 4G HIF IPC test module.
+
+          To compile this driver as a module, choose M here: the
+          module will be called lld-hif-test.
+
+config MAILBOX_IPC_USE_CHECKSUM
+       tristate "MAILBOX IPC CHECKSUM support"
+       depends on MAILBOX_IPC
+       ---help---
+         Say Y here if you want to enable MAILBOX IPC CHECKSUM.
+	 
+	 
+config MAILBOX_IPC_ARCH_V2
+       tristate "MAILBOX IPC architecture version 2"
+       depends on MAILBOX_IPC
+       ---help---
+         Say Y here if you want to enable MAILBOX IPC version 2.

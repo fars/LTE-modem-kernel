@@ -1,0 +1,1 @@
+../../arch/arm/mach-omap2/prcm-regs.h
